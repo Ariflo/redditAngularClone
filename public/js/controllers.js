@@ -64,6 +64,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 				// Save the JWT to localStorage so we can use it later
 				localStorage.setItem('jwt', data.data.jwt);
 				$scope.user.id = data.data.id
+				$scope.user.username = data.data.username;
 				$scope.isAuthenticated = true;
 			}).catch(function(err){
 				console.log(err);
@@ -81,8 +82,6 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		$scope.isAuthenticated = false;
 		$scope.user = {};
 	}
-
-	
 
 
     	$scope.postSubmit = function(form){
