@@ -1,5 +1,5 @@
-redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location', '$routeParams', 'User', 'Post' ,'Postit',
-	                                     function($scope,  $http,  $parse,  $location,   $routeParams,   User,  Post, Postit) {
+redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location', '$routeParams', 'User', 'Post' , 'Postit', 'Comment',
+	                                     function($scope,  $http,  $parse,  $location,   $routeParams,   User,  Post, Postit, Comment) {
 	$scope.newPostData = {};
 	$scope.reveal = false;
 	$scope.isAuthenticated = false;
@@ -18,17 +18,16 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 			$scope.isAuthenticated = true;
 
 		}).catch(function(err){
-			console.log(err);
-			console.log("BAD THING ^^^");
+			console.log("Please Sign in to gain access to edit forum");
 		});
 	}
 	
 
 	Post.get(function(posts){
+		console.log(posts.data);
 		$scope.posts = posts.data;
 	})
 
-	
 	
 	$scope.toggleModal = function(){
 	        $scope.showModal = !$scope.showModal;
@@ -47,11 +46,13 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 			}).then(function(data) {
 				// Save the JWT to localStorage so we can use it later
 				localStorage.setItem('jwt', data.data.jwt);
-				$scope.user.id = data.data.id
+
+				$scope.user.id = data.data.id;
+				$scope.user.username = data.data.username;
 				$scope.isAuthenticated = true;
+
 			}).catch(function(err){
-				console.log(err);
-				console.log("BAD THING ^^^");
+				console.log(err.message);
 			});
 	}
 
@@ -63,12 +64,13 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 			}).then(function(data) {
 				// Save the JWT to localStorage so we can use it later
 				localStorage.setItem('jwt', data.data.jwt);
-				$scope.user.id = data.data.id
+
+				$scope.user.id = data.data.id;
 				$scope.user.username = data.data.username;
 				$scope.isAuthenticated = true;
+
 			}).catch(function(err){
-				console.log(err);
-				console.log("BAD THING ^^^");
+				console.log(err.message);
 			});
 	}
 
@@ -86,29 +88,41 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 
     	$scope.postSubmit = function(form){
 		if (form.$valid) {
-				$scope.newPostData.userId = $scope.user.id;
-				$scope.newPostData.addComment = {}; 
-				$scope.newPostData.commentOn = false; 
-				$scope.newPostData.newCommentOn = false;
+					$scope.newPostData.userId = $scope.user.id[0];
+					$scope.newPostData.addComment = {}; 
+					$scope.newPostData.commentOn = false; 
+					$scope.newPostData.newCommentOn = false;
 
-				Post.save($scope.newPostData, function(){
-					$scope.postid = data;
-				});
-
+					Post.save($scope.newPostData);
 			         };
 			         $scope.newPostData = {};	
 	};
 
 	$scope.postComment = function(form, post){
+		post.commentPost = {};
 		if (form.$valid) {
-			post.addComment.userId = $scope.user.id;
-			post.addComment.postId = post.id;
+			Comment.get(post, function(comments){
+				if(comments.data.comment_body){
 
-			Comment.save(post.addComment);
-			post.addComment = {};
-		};		
-	
-		$scope.newPostData = {};
+					comments.data.comment_body.push(post.comment);
+
+					post.commentPost.userId = $scope.user.id[0];
+					post.commentPost.postId = post.id;
+					post.commentPost.comments = comments.data.comment_body;
+
+					Comment.save(post.commentPost);
+				}else{	
+			                        comments.data.comment_body = [];
+					comments.data.comment_body.push(post.comment);
+
+					post.commentPost.userId = $scope.user.id[0];
+					post.commentPost.postId = post.id;
+					post.commentPost.comments = comments.data.comment_body;
+
+					Comment.save(post.commentPost);
+				}
+			});	
+		};			
 	}
 	
 	$scope.ratingUp = function(post){
@@ -127,7 +141,6 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 			post.post_score = data.score;
 			});
 		}
-		
 	}
 
 	$scope.toggleComments = function(post) {

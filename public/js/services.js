@@ -6,6 +6,10 @@ redditApp.service('Post', ["$resource", function ($resource) {
     return $resource('/posts');
 }]);
 
+redditApp.service('Comment', ["$resource", function ($resource) {
+    return $resource('/comments');
+}]);
+
 redditApp.service('Postit', ["$resource", function ($resource) {
     return $resource('/posts/:id', { id: '@id' }, { 
 	    	'update': {

@@ -6,10 +6,12 @@ var bcrypt = require('bcrypt');
 var  jwt = require('jsonwebtoken');
 require('dotenv').config()
 
+//Render index page
 apiRouter.get('/', function(req,res,next){
 	res.render('index');
 })
 
+//Verify user is logged in 
 apiRouter.get('/user/:id', function(req, res, next) {
 		if (req.headers.authorization) {
 
@@ -19,15 +21,6 @@ apiRouter.get('/user/:id', function(req, res, next) {
 			res.json({decoded});
 		}
 });
-
-apiRouter.get('/posts', function(req, res, next) {
-	knex('posts')
-	//.innerJoin('posts', 'users.id', 'posts.user_id')
-	.then(function(data){
-	    	res.json({data});
-	});
-});
-
 
 //SIGNUP
 apiRouter.post('/users', function(req, res) {
@@ -52,7 +45,7 @@ apiRouter.post('/users', function(req, res) {
 
 	        	// On success, we send the token back
 	        	// to the browser.
-	        	res.json({jwt:token});
+	        	res.json({jwt:token, username:req.body.username, id: id});
 	        });
 	      });
 	    });
@@ -83,7 +76,7 @@ apiRouter.post('/login', function(req, res) {
 
 	    				// On success, we send the token back
 	    				// to the browser.
-	    				res.json({jwt:token});
+	    				res.json({jwt:token, username:req.body.username, id: id});
 	    			}else{
 					res.json({
 			            		error: JSON.stringify(err),
@@ -122,45 +115,78 @@ apiRouter.post('/posts', function(req, res, next) {
 	    })
 	    .returning('id')
 	    .then(function(id){
-	    	res.json({id:id[0]})
+	    	res.json({id:id})
 	    });
 });
 
-apiRouter.post('/comments', function(req, res, next) {
+//get Posts from DB
+apiRouter.get('/posts', function(req, res, next) {
+	knex('posts')
+	.join('users', 'posts.user_id', '=', 'users.id')
+	.join('comments', 'posts.id', '=', 'comments.post_id')
+	.then(function(data){
+	    	res.json({data});
+	});
+});
+
+//get Comments from DB
+apiRouter.get('/comments', function(req, res, next) {
 	knex('comments')
-	    .insert({user_id: req.body.userId,
-	    	    post_id: req.body.postId,
-	    	    comment_body:req.body.comment,
-	    	    comment_time: new Date(),
-	    	    comment_score: 0})
-	    .then(function(){
-	    	res.send("saved");
-	    })
+	.where({post_id: req.query.id})
+	.then(function(data){
+	    	res.json({data});
+	});
+});
+
+//post Comments to DB
+apiRouter.post('/comments', function(req, res, next) {
+	//eval(locus);
+	knex('comments')
+	.where({post_id: req.body.postId}).first().then(function(comments){
+		if(comments){
+			knex('comments')
+			.where({post_id:comments.post_id})
+			.update({comment_body: req.body.comments})
+			.returning('id')
+			.then(function(id){
+				res.json({id:id})
+			});
+		}else{
+			knex('comments')
+			.insert({user_id: req.body.userId,
+				post_id: req.body.postId,
+				comment_body: req.body.comments})
+			.returning('id')
+			.then(function(id){
+				res.json({id:id})
+			});
+		}
+	})
+
 });
 
 
+// apiRouter.put('/posts/:id', function(req, res, next) {
+// 	if(req.body.stat === 'up'){
+// 		knex('posts')
+// 		.where({id:req.body.id})
+// 		.increment('post_score', 1)
+// 		.returning('post_score')
+// 		.then(function(score){
+// 			res.json({score:score[0]});
+// 		});	
+// 	}else{
+// 		knex('posts')
+// 		.where({id:req.body.id})
+// 		.decrement('post_score', 1)
+// 		.returning('post_score')
+// 		.then(function(score){
+// 			res.json({score:score[0]});
+// 		});
 
-apiRouter.put('/posts/:id', function(req, res, next) {
-	if(req.body.stat === 'up'){
-		knex('posts')
-		.where({id:req.body.id})
-		.increment('post_score', 1)
-		.returning('post_score')
-		.then(function(score){
-			res.json({score:score[0]});
-		});	
-	}else{
-		knex('posts')
-		.where({id:req.body.id})
-		.decrement('post_score', 1)
-		.returning('post_score')
-		.then(function(score){
-			res.json({score:score[0]});
-		});
+// 	}	
 
-	}	
-
-});
+// });
 
 
 module.exports = apiRouter;

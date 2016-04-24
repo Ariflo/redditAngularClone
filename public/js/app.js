@@ -18,5 +18,4 @@ redditApp.config(function($routeProvider, $locationProvider,$httpProvider){
 	})
 
 	$httpProvider.interceptors.push('authInterceptor');
-
 });
