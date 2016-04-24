@@ -145,7 +145,8 @@ apiRouter.post('/comments', function(req, res, next) {
 	.where({comment_post_id: req.body.postId}).first().then(function(comments){
 		if(comments){
 			knex('comments')
-			.where({comment_post_id: comments.post_id})
+			.where({comment_post_id: comments.comment_post_id})
+			.first()
 			.update({comment_body: req.body.comments})
 			.returning('id')
 			.then(function(id){
