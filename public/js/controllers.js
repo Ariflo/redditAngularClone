@@ -104,7 +104,6 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		if (form.$valid) {
 			Comment.get(post, function(comments){
 				if(comments.data.comment_body){
-
 					comments.data.comment_body.push(post.comment);
 
 					post.commentPost.username = $scope.user.username;

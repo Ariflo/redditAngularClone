@@ -132,7 +132,8 @@ apiRouter.get('/posts', function(req, res, next) {
 //get Comments from DB
 apiRouter.get('/comments', function(req, res, next) {
 	knex('comments')
-	.where({comment_post_id: req.query.id})
+	.where({comment_post_id: req.query.comment_post_id})
+	.returning('comment_body')
 	.then(function(data){
 	    	res.json({data});
 	});
@@ -142,7 +143,6 @@ apiRouter.get('/comments', function(req, res, next) {
 apiRouter.post('/comments', function(req, res, next) {
 	knex('comments')
 	.where({comment_post_id: req.body.postId}).first().then(function(comments){
-		console.log(comments);
 		if(comments){
 			knex('comments')
 			.where({comment_post_id: comments.post_id})
