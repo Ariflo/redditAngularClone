@@ -123,7 +123,7 @@ apiRouter.post('/posts', function(req, res, next) {
 apiRouter.get('/posts', function(req, res, next) {
 	knex('posts')
 	.join('users', 'posts.user_id', '=', 'users.id')
-	.join('comments', 'posts.id', '=', 'comments.post_id')
+	.join('comments', 'posts.id', '=', 'comments.comment_post_id')
 	.then(function(data){
 	    	res.json({data});
 	});
@@ -132,7 +132,7 @@ apiRouter.get('/posts', function(req, res, next) {
 //get Comments from DB
 apiRouter.get('/comments', function(req, res, next) {
 	knex('comments')
-	.where({post_id: req.query.id})
+	.where({comment_post_id: req.query.id})
 	.then(function(data){
 	    	res.json({data});
 	});
@@ -140,12 +140,12 @@ apiRouter.get('/comments', function(req, res, next) {
 
 //post Comments to DB
 apiRouter.post('/comments', function(req, res, next) {
-	//eval(locus);
 	knex('comments')
-	.where({post_id: req.body.postId}).first().then(function(comments){
+	.where({comment_post_id: req.body.postId}).first().then(function(comments){
+		console.log(comments);
 		if(comments){
 			knex('comments')
-			.where({post_id:comments.post_id})
+			.where({comment_post_id: comments.post_id})
 			.update({comment_body: req.body.comments})
 			.returning('id')
 			.then(function(id){
@@ -153,8 +153,8 @@ apiRouter.post('/comments', function(req, res, next) {
 			});
 		}else{
 			knex('comments')
-			.insert({user_id: req.body.userId,
-				post_id: req.body.postId,
+			.insert({comment_username: req.body.username,
+				comment_post_id: req.body.postId,
 				comment_body: req.body.comments})
 			.returning('id')
 			.then(function(id){

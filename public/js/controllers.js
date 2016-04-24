@@ -26,6 +26,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 	Post.get(function(posts){
 		console.log(posts.data);
 		$scope.posts = posts.data;
+		$scope.comments = posts.data[0].comment_body;
 	})
 
 	
@@ -106,7 +107,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 
 					comments.data.comment_body.push(post.comment);
 
-					post.commentPost.userId = $scope.user.id[0];
+					post.commentPost.username = $scope.user.username;
 					post.commentPost.postId = post.id;
 					post.commentPost.comments = comments.data.comment_body;
 
@@ -115,7 +116,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 			                        comments.data.comment_body = [];
 					comments.data.comment_body.push(post.comment);
 
-					post.commentPost.userId = $scope.user.id[0];
+					post.commentPost.username = $scope.user.username;
 					post.commentPost.postId = post.id;
 					post.commentPost.comments = comments.data.comment_body;
 

@@ -125,14 +125,14 @@
 		</div>
     
             <div class="newComment">
-                <form name="newComment" ng-submit="postComment(newComment, post)" ng-show="post.newCommentOn===true">
+                <form name="newComment" ng-submit="postComment(newComment, post)" ng-show="post.newCommentOn">
                             <label><b>Comment:</b></label> 
                             <input type="text" ng-model="post.comment" placeholder="Write a comment here.." required>
                             <input type="submit">
                 </form>
             </div>
 
-		<div ng-repeat="comment in post.comments">
-			<div ng-show="post.commentOn===true" class="comment"><b>{{comment.author}}:</b> {{comment.comment}}</div>
+		<div ng-repeat="comment in comments">
+			<div ng-show="post.commentOn" class="comment"><b>{{post.comment_username}}:</b> {{comment}}</div>
 		</div>
 	</div>
