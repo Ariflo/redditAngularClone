@@ -92,7 +92,7 @@
 <div class="container" ng-repeat = "post in posts | filter:searchText | orderBy: currentOrderBy">
 	<div class="row">
 		<div class = "col-xs-2" >
-			<img class="ico" src="{{post.img_url}}">
+			<img class="ico" ng-src="{{post.img_url}}">
 		</div>
 		
 		<div class="col-xs-10">

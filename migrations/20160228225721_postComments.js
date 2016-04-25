@@ -3,7 +3,6 @@ exports.up = function(knex, Promise) {
     table.increments();
     table.integer('post_id').unsigned().index().references('id').inTable('posts');
     table.integer('comment_id').unsigned().index().references('id').inTable('comments');
-
   });
 };
 
