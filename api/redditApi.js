@@ -143,9 +143,9 @@ apiRouter.get('/comments', function(req, res, next) {
 apiRouter.post('/comments', function(req, res, next) {
 	knex('comments')
 	.where({comment_post_id: req.body.postId}).first().then(function(comments){
-		if(comments){
+		if(comments.comment_post_id === req.body.postId && comments.comment_username === req.body.username){
 			knex('comments')
-			.where({comment_post_id: comments.comment_post_id})
+			.where({comment_post_id: comments.comment_post_id, comment_username: comments.comment_username})
 			.first()
 			.update({comment_body: req.body.comments})
 			.returning('id')

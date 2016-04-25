@@ -27,8 +27,9 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		console.log(posts.data);
 		$scope.posts = posts.data;
 		var commentData = posts.data[0].comment_body;
-
+		//console.log(commentData);
 		commentData.forEach(function(comment){
+			//console.log(comment);
 			var comments = JSON.parse(comment);
 			$scope.comment_username = comments.user;
 			$scope.comments = comments.comments;
@@ -108,20 +109,22 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 
 	$scope.postComment = function(form, post){
 		post.commentPost = {};
-		post.comments = [];
 		if (form.$valid) {
 			Comment.get(post, function(comments){
-				
-				if(comments.data.comment_body !== undefined){
-					comments.data[0].comment_body.push(post.comment);
+				var commentData = comments.data[0].comment_body;
+				var oldComments = JSON.parse(comments.data[0].comment_body);
+
+				if(oldComments !== undefined && oldComments.user ===  $scope.user.username){
+					oldComments.comments.push(post.comment);
+					post.comments.push(oldComments);
 
 					post.commentPost.username = $scope.user.username;
 					post.commentPost.postId = post.id;
-					post.commentPost.comments = comments.data[0].comment_body;
+					post.commentPost.comments = post.comments;
 
 					Comment.save(post.commentPost);
 				}else{	
-
+					post.comments = [];
 			                        comments.data.comment_body = {user: $scope.user.username, 
 			                        				        comments: [] };
 			                        comments.data.comment_body.comments.push(post.comment);
