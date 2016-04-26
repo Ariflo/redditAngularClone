@@ -3,7 +3,11 @@ redditApp.service('User', ["$resource", function ($resource) {
 }]);
 
 redditApp.service('Post', ["$resource", function ($resource) {
-    return $resource('/posts');
+    return $resource('/posts', {
+    	'query':  {
+    			method:'GET', isArray:false
+    		}
+    	});
 }]);
 
 redditApp.service('Comment', ["$resource", function ($resource) {

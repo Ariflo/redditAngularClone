@@ -13,8 +13,8 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         					method: "GET",
 		         					url: "/user/" + token
 		         				}).then(function(data) {
-		         					$scope.user.id = data.data.decoded.id;
-		         					$scope.user.username = data.data.decoded.username;
+		         					$scope.user.id = data.data.id[0];
+		         					$scope.user.username = data.data.username;
 		         					$scope.isAuthenticated = true;
 		         				}).catch(function(err){
 		         					console.log("Please Sign in to gain access to edit forum");
@@ -22,26 +22,24 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         			}
 
 		         			var _getPosts = function(posts){
-			         						if(posts.data[0] === undefined){
 
-			         							return null;
-			         						}else if (posts.data[0].comment_body){
+	         						if(posts.data === undefined){
+	         							return null;
+	         						}else{
+	         							posts.data.forEach(function(post){
+	         								if(post.comment_body[0]){
+	         									var comments = JSON.parse(post.comment_body);
 
-			         							var commentObj = posts.data[0].comment_body;
-			         							commentObj.forEach(function(comment){
-			         								var comments = JSON.parse(comment);
-			         								$scope.comment_username = comments.user;
-			         								$scope.comments = comments.comments;
-			         							});
-			         							$scope.posts = posts.data;
-			         						}else{
-			         							$scope.posts = posts.data;
-			         						}
-			         				 	};
+	         									$scope.comment_username = comments.user;
+	         									$scope.comments = comments.comments;
+	         								}
+	         							});
+	         							$scope.posts = posts.data;
+	         						}
 
-		         			
-		         			Post.get(_getPosts);	
-		         			
+		         			}	
+		         			Post.get(_getPosts);
+		         	
 		         			
 		         			$scope.toggleModal = function(){
 		         			        $scope.showModal = !$scope.showModal;
@@ -105,7 +103,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 	         							$scope.newPostData.newCommentOn = false;
 
 	         							Post.save($scope.newPostData);
-							            Post.get(_getPosts);
+							            //Post.get(_getPosts);
 
 		         					            $scope.newPostData = {};
 		         					}
@@ -116,9 +114,11 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 
 		         				if (form.$valid) {
 		         					Comment.query(post, function(comments){
+
 		         						var commentData = comments[0];
 		         						
 		         						if(commentData !== undefined){
+
 		         							post.comments = [];
 		     							var oldComments = JSON.parse(commentData.comment_body[0]);
 
@@ -129,27 +129,30 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         							post.commentPost.postId = post.id;
 		         							post.commentPost.comments = post.comments;
 
-		         							Comment.save(post.commentPost)
-		         							Post.get(_getPosts);
+		         							Comment.save(post.commentPost);
+		         							Post.save(post);
+		         							//Post.get(_getPosts);
 		         						}else{	
+
 		         							commentData = {};
 		         							post.comments = [];
 		         					                        commentData.comment_body = {user: $scope.user.username, 
 		         					                        				        comments: [] };
 
 		         					                        commentData.comment_body.comments.push(post.comment);
-		         							post.comments.push( commentData.comment_body);
+		         							post.comments.push(commentData.comment_body);
 
 		         							post.commentPost.username = $scope.user.username;
 		         							post.commentPost.postId = post.id;
 		         							post.commentPost.comments = post.comments;
-		         							post.commentPost.post = post;
 
 			         						Comment.save(post.commentPost)
-			         						Post.get(_getPosts);
+			         						Post.save(post);
+			         						// Post.get(_getPosts);
 		         						}
+		         					
 		         					 });	
-		         				};			
+		         				};		
 		         			}
 		         			
 		         			$scope.ratingUp = function(post){
