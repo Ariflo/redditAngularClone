@@ -13,7 +13,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         					method: "GET",
 		         					url: "/user/" + token
 		         				}).then(function(data) {
-		         					$scope.user.id = data.data.decoded.id[0];
+		         					$scope.user.id = data.data.decoded.id;
 		         					$scope.user.username = data.data.decoded.username;
 		         					$scope.isAuthenticated = true;
 		         				}).catch(function(err){
@@ -21,18 +21,27 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         				});
 		         			}
 
-		         			Post.get(function(posts){
-		         				//console.log(posts.data);
-		         				$scope.posts = posts.data;
-		         				// var commentData = posts.data.comment_body;
-		         				// //console.log(commentData);
-		         				// commentData.forEach(function(comment){
-		         				// 	//console.log(comment);
-		         				// 	var comments = JSON.parse(comment);
-		         				// 	$scope.comment_username = comments.user;
-		         				// 	$scope.comments = comments.comments;
-		         				// });
-		         			})
+		         			var _getPosts = function(posts){
+			         						if(posts.data[0] === undefined){
+
+			         							return null;
+			         						}else if (posts.data[0].comment_body){
+
+			         							var commentObj = posts.data[0].comment_body;
+			         							commentObj.forEach(function(comment){
+			         								var comments = JSON.parse(comment);
+			         								$scope.comment_username = comments.user;
+			         								$scope.comments = comments.comments;
+			         							});
+			         							$scope.posts = posts.data;
+			         						}else{
+			         							$scope.posts = posts.data;
+			         						}
+			         				 	};
+
+		         			
+		         			Post.get(_getPosts);	
+		         			
 		         			
 		         			$scope.toggleModal = function(){
 		         			        $scope.showModal = !$scope.showModal;
@@ -96,30 +105,23 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 	         							$scope.newPostData.newCommentOn = false;
 
 	         							Post.save($scope.newPostData);
-			         					Post.get(function(posts){
-				         					 //console.log(posts.data);
-				         					 $scope.posts = posts.data;
-				         					 // var commentData = posts.data.comment_body;
-				         					 // //console.log(commentData);
-				         					 // commentData.forEach(function(comment){
-				         					 // 	//console.log(comment);
-				         					 // 	var comments = JSON.parse(comment);
-				         					 // 	$scope.comment_username = comments.user;
-				         					 // 	$scope.comments = comments.comments;
-				         					 // });
-			         				 	})	
-		         					         };
-		         					         $scope.newPostData = {};
+							            Post.get(_getPosts);
+
+		         					            $scope.newPostData = {};
+		         					}
 		         			};
 
 		         			$scope.postComment = function(form, post){
 		         				post.commentPost = {};
-		         				if (form.$valid) {
-		         					Comment.get(post, function(comments){
-		         						var commentData = comments.data[0].comment_body;
-		         						var oldComments = JSON.parse(comments.data[0].comment_body);
 
-		         						if(oldComments !== undefined && oldComments.user ===  $scope.user.username){
+		         				if (form.$valid) {
+		         					Comment.query(post, function(comments){
+		         						var commentData = comments[0];
+		         						
+		         						if(commentData !== undefined){
+		         							post.comments = [];
+		     							var oldComments = JSON.parse(commentData.comment_body[0]);
+
 		         							oldComments.comments.push(post.comment);
 		         							post.comments.push(oldComments);
 
@@ -127,21 +129,26 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         							post.commentPost.postId = post.id;
 		         							post.commentPost.comments = post.comments;
 
-		         							Comment.save(post.commentPost);
+		         							Comment.save(post.commentPost)
+		         							Post.get(_getPosts);
 		         						}else{	
+		         							commentData = {};
 		         							post.comments = [];
-		         					                        comments.data.comment_body = {user: $scope.user.username, 
+		         					                        commentData.comment_body = {user: $scope.user.username, 
 		         					                        				        comments: [] };
-		         					                        comments.data.comment_body.comments.push(post.comment);
-		         							post.comments.push(comments.data.comment_body);
+
+		         					                        commentData.comment_body.comments.push(post.comment);
+		         							post.comments.push( commentData.comment_body);
 
 		         							post.commentPost.username = $scope.user.username;
 		         							post.commentPost.postId = post.id;
 		         							post.commentPost.comments = post.comments;
+		         							post.commentPost.post = post;
 
-		         							Comment.save(post.commentPost);
+			         						Comment.save(post.commentPost)
+			         						Post.get(_getPosts);
 		         						}
-		         					});	
+		         					 });	
 		         				};			
 		         			}
 		         			

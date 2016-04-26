@@ -76,7 +76,7 @@ apiRouter.post('/login', function(req, res) {
 
 	    				// On success, we send the token back
 	    				// to the browser.
-	    				res.json({jwt:token, username:req.body.username, id: id});
+	    				res.json({jwt:token, username:user.username, id: user.id});
 	    			}else{
 					res.json({
 			            		error: JSON.stringify(err),
@@ -100,34 +100,40 @@ apiRouter.post('/login', function(req, res) {
 	    });
 });
 
+//get Posts from DB
+apiRouter.get('/posts', function(req, res, next) {
+
+	knex('posts')
+	.then(function(data){
+	    	res.json({data});
+	});
 
 
-//Posts into DB
+	// knex('users')
+	// .join('posts', 'users.id', '=', 'posts.user_id')
+	// .join('post_comments', 'posts.id', '=', 'post_comments.post_id')
+	// .join('comments', 'post_comments.post_id', '=', 'comments.comment_post_id ')
+	// .then(function(data){
+	//     	res.json({data});
+	// });
+});
+
+//Posts Posts into DB
 apiRouter.post('/posts', function(req, res, next) {
 	knex('posts')
-	    .insert(
+	.insert(
 	    	{user_id: req.body.userId,
 	    	 title:req.body.title,
 	    	 img_url:req.body.image,
 	    	 post_time: new Date(),
 	    	 post_body:req.body.post_body,
 	    	 post_score: 0
-	    })
-	    .returning('id')
-	    .then(function(id){
-	    	res.json({id:id})
-	    });
+	}).then(function(done){
+		
+		return done;
+	})
 });
 
-//get Posts from DB
-apiRouter.get('/posts', function(req, res, next) {
-	knex('posts')
-	.join('users', 'posts.user_id', '=', 'users.id')
-	.join('comments', 'posts.id', '=', 'comments.comment_post_id')
-	.then(function(data){
-	    	res.json({data});
-	});
-});
 
 //get Comments from DB
 apiRouter.get('/comments', function(req, res, next) {
@@ -135,7 +141,7 @@ apiRouter.get('/comments', function(req, res, next) {
 	.where({comment_post_id: req.query.comment_post_id})
 	.returning('comment_body')
 	.then(function(data){
-	    	res.json({data});
+	    	res.send(data);
 	});
 });
 
@@ -143,14 +149,19 @@ apiRouter.get('/comments', function(req, res, next) {
 apiRouter.post('/comments', function(req, res, next) {
 	knex('comments')
 	.where({comment_post_id: req.body.postId}).first().then(function(comments){
-		if(comments.comment_post_id === req.body.postId && comments.comment_username === req.body.username){
+		if(comments){
 			knex('comments')
 			.where({comment_post_id: comments.comment_post_id, comment_username: comments.comment_username})
 			.first()
 			.update({comment_body: req.body.comments})
 			.returning('id')
 			.then(function(id){
-				res.json({id:id})
+			    knex('post_comments')
+			    .insert({post_id: req.body.postId, comment_id: id[0]})
+			    .then(function(done){
+		
+				return done;
+			     })
 			});
 		}else{
 			knex('comments')
@@ -158,36 +169,40 @@ apiRouter.post('/comments', function(req, res, next) {
 				comment_post_id: req.body.postId,
 				comment_body: req.body.comments})
 			.returning('id')
-			.then(function(id){
-				res.json({id:id})
+			.then(function(id){	
+			    knex('post_comments')
+			    .insert({post_id: req.body.postId, comment_id: id[0]})
+			    .then(function(done){
+		
+				return done;
+			     })
 			});
 		}
 	})
-
 });
 
 
-// apiRouter.put('/posts/:id', function(req, res, next) {
-// 	if(req.body.stat === 'up'){
-// 		knex('posts')
-// 		.where({id:req.body.id})
-// 		.increment('post_score', 1)
-// 		.returning('post_score')
-// 		.then(function(score){
-// 			res.json({score:score[0]});
-// 		});	
-// 	}else{
-// 		knex('posts')
-// 		.where({id:req.body.id})
-// 		.decrement('post_score', 1)
-// 		.returning('post_score')
-// 		.then(function(score){
-// 			res.json({score:score[0]});
-// 		});
+apiRouter.put('/posts/:id', function(req, res, next) {
+	if(req.body.stat === 'up'){
+		knex('posts')
+		.where({id:req.body.id})
+		.increment('post_score', 1)
+		.returning('post_score')
+		.then(function(score){
+			res.json({score:score[0]});
+		});	
+	}else{
+		knex('posts')
+		.where({id:req.body.id})
+		.decrement('post_score', 1)
+		.returning('post_score')
+		.then(function(score){
+			res.json({score:score[0]});
+		});
 
-// 	}	
+	}	
 
-// });
+});
 
 
 module.exports = apiRouter;

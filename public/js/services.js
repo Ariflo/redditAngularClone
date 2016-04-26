@@ -7,7 +7,11 @@ redditApp.service('Post', ["$resource", function ($resource) {
 }]);
 
 redditApp.service('Comment', ["$resource", function ($resource) {
-    return $resource('/comments');
+    return $resource('/comments', {
+    	'query':  {
+    			method:'GET', isArray:false
+    		}
+    	});
 }]);
 
 redditApp.service('Postit', ["$resource", function ($resource) {
@@ -29,3 +33,4 @@ redditApp.service('authInterceptor', function($window,$location,$q){
 		}
 	}
 })
+
