@@ -133,8 +133,9 @@
           </div>
 
 	<div class="col-xs-4" ng-repeat="comment in post.comment_body track by $index" >
-		<div ng-show="!post.commentOn" class="comment"><b>{{comment.user}}:</b>
-                  <span ng-repeat="comment in comment.comments track by $index"> {{comment}}</span>
+		<div ng-show="!post.commentOn" class="comment" ng-repeat="comment in comment.comments track by $index">
+                  <b>{{post.comment_user}}:</b>
+                  <span > {{comment}}</span>
             </div>
 	</div>
 </div>

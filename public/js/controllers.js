@@ -36,8 +36,8 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
          									var commentData = comments[0];
          									if(commentData !== undefined){
          										//assign this posts comments 
+         										post.comment_user = commentData.comment_body[0].user;
          										post.comment_body = commentData.comment_body
-
          										postArray.push(post);
 
          									}else{
