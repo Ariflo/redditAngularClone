@@ -1,5 +1,5 @@
-redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location', '$routeParams', 'User', 'Post' , 'Postit', 'Comment',
-	                                     function($scope,  $http,  $parse,  $location,   $routeParams,   User,  Post, Postit, Comment) {
+redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', '$location', '$routeParams', 'User', 'Post' , 'Postit', 'Comment',
+	                                     function($scope,  $http,  $parse, $timeout, $location, $routeParams,   User,  Post, Postit, Comment) {
 
 		         			$scope.newPostData = {};
 		         			$scope.reveal = false;
@@ -117,10 +117,13 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 	         							$scope.newPostData.newCommentOn = false;
 
 	         							Post.save($scope.newPostData);
-							            //Post.get(_getPosts);
 
-		         					            $scope.newPostData = {};
+	         							$timeout(function(){
+	         								Post.get(_getPosts);
+	         							}, 500);
+	         							
 		         					}
+	         					            $scope.newPostData = {};
 		         			};
 
 		         			$scope.postComment = function(form, post){
@@ -140,7 +143,9 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         							post.commentPost.comments =post.comment_body;
 
 		         							Comment.save(post.commentPost);
-		         							//Post.get(_getPosts);
+		         							$timeout(function(){
+		         								Post.get(_getPosts);
+		         							}, 500);
 		         						}else{
 		         					                        post.comment_body = [{user: $scope.user.username, 
 		         					                        				        comments: [post.comment]}];
@@ -150,7 +155,9 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         					                      	post.commentPost.comments = post.comment_body;
 
 		         					                      	Comment.save(post.commentPost);
-			         						//Post.get(_getPosts);
+			         						$timeout(function(){
+			         							Post.get(_getPosts);
+			         						}, 500);
 		         						}
 		         					});	
 		         				};		
