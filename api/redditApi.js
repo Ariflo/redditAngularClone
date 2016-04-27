@@ -140,7 +140,8 @@ apiRouter.post('/posts', function(req, res, next) {
 			    	 post_time: new Date(),
 			    	 post_body:req.body.post_body,
 			    	 post_score: 0,
-			    	 comment_body: []
+			    	 comment_body: [],
+			    	 commentOn: false
 			}).then(function(done){
 				
 				return done;

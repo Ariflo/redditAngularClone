@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
 		table.timestamp('post_time');
 		table.text('post_body');
 		table.integer('post_score');
+		table.boolean('commentOn');
 		table.specificType('comment_body', 'text[]')
 	});
 };

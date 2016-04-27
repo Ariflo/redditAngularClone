@@ -21,17 +21,23 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         				});
 		         			}
 
+
 		         			var _getPosts = function(posts){
+
+		         					//var postArray =[];
 
 	         						if(posts.data === undefined){
 	         							return null;
 	         						}else{
 	         							posts.data.forEach(function(post){
-	         								if(post.comment_body[0]){
-	         									var comments = JSON.parse(post.comment_body);
-
+	         								if(post.comment_body[0] === undefined){
+	         									postArray.push(post);
+	         								}else{
+	         									var comments = JSON.parse(post.comment_body[0]);
 	         									$scope.comment_username = comments.user;
 	         									$scope.comments = comments.comments;
+	         									post.commentOn = true;
+	         									console.log(post);
 	         								}
 	         							});
 	         							$scope.posts = posts.data;
