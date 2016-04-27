@@ -24,25 +24,34 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 
 		         			var _getPosts = function(posts){
 
-		         					var postArray =[];
+         						if(posts.data === undefined){
+         							return null;
+         						}else{
+         							var postArray = [];
 
-	         						if(posts.data === undefined){
-	         							return null;
-	         						}else{
-	         							posts.data.forEach(function(post){
-	         								if(post.comment_body[0] === undefined){
-	         									postArray.push(post);
-	         								}else{
-	         									var comments = JSON.parse(post.comment_body[0]);
-	         									$scope.comment_username = comments.user;
-	         									$scope.comments = comments.comments;
-	         									post.commentOn = true;
-	         								}
-	         							});
-	         							$scope.posts = postArray;
-	         						}
+         							posts.data.forEach(function(post){
 
+         								Comment.query(post, function(comments){
+
+         									var commentData = comments[0];
+         									if(commentData !== undefined){
+         										//assign this posts comments 
+         										post.comment_body = commentData.comment_body
+
+         										postArray.push(post);
+
+         									}else{
+         										//assign this post with no comments 
+         										post.comment_body = [];
+         										postArray.push(post);
+         									}
+         								});
+         							});
+         							
+         							$scope.posts = postArray;
+         						}
 		         			}	
+
 		         			Post.get(_getPosts);
 		         	
 		         			
@@ -72,20 +81,20 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         			}
 
 		         			$scope.login = function() {
-		         					$http({
-		         						method: "POST",
-		         						url: "/login",
-		         						data: $scope.user
-		         					}).then(function(data) {
-		         						// Save the JWT to localStorage so we can use it later
-		         						localStorage.setItem('jwt', data.data.jwt);
-		         						$scope.user.id = data.data.id[0];
-		         						$scope.user.username = data.data.username;
-		         						$scope.isAuthenticated = true;
+	         					$http({
+	         						method: "POST",
+	         						url: "/login",
+	         						data: $scope.user
+	         					}).then(function(data) {
+	         						// Save the JWT to localStorage so we can use it later
+	         						localStorage.setItem('jwt', data.data.jwt);
+	         						$scope.user.id = data.data.id[0];
+	         						$scope.user.username = data.data.username;
+	         						$scope.isAuthenticated = true;
 
-		         					}).catch(function(err){
-		         						console.log(err.message);
-		         					});
+	         					}).catch(function(err){
+	         						console.log(err.message);
+	         					});
 		         			}
 
 		         			$scope.signedIn = function(){
@@ -118,45 +127,32 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 		         				post.commentPost = {};
 
 		         				if (form.$valid) {
+
 		         					Comment.query(post, function(comments){
 
 		         						var commentData = comments[0];
 		         						
 		         						if(commentData !== undefined){
-
-		         							post.comments = [];
-		     							var oldComments = JSON.parse(commentData.comment_body[0]);
-
-		         							oldComments.comments.push(post.comment);
-		         							post.comments.push(oldComments);
+		         							post.comment_body[0].comments.push(post.comment);
 
 		         							post.commentPost.username = $scope.user.username;
 		         							post.commentPost.postId = post.id;
-		         							post.commentPost.comments = post.comments;
+		         							post.commentPost.comments =post.comment_body;
 
 		         							Comment.save(post.commentPost);
-		         							Post.save(post);
 		         							//Post.get(_getPosts);
-		         						}else{	
+		         						}else{
+		         					                        post.comment_body = [{user: $scope.user.username, 
+		         					                        				        comments: [post.comment]}];
 
-		         							commentData = {};
-		         							post.comments = [];
-		         					                        commentData.comment_body = {user: $scope.user.username, 
-		         					                        				        comments: [] };
+		         					                      	post.commentPost.username = $scope.user.username;
+		         					                      	post.commentPost.postId = post.id;
+		         					                      	post.commentPost.comments = post.comment_body;
 
-		         					                        commentData.comment_body.comments.push(post.comment);
-		         							post.comments.push(commentData.comment_body);
-
-		         							post.commentPost.username = $scope.user.username;
-		         							post.commentPost.postId = post.id;
-		         							post.commentPost.comments = post.comments;
-
-			         						Comment.save(post.commentPost)
-			         						Post.save(post);
-			         						// Post.get(_getPosts);
+		         					                      	Comment.save(post.commentPost);
+			         						//Post.get(_getPosts);
 		         						}
-		         					
-		         					 });	
+		         					});	
 		         				};		
 		         			}
 		         			

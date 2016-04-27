@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
 		table.increments(); //create id SERIAL PRIMARY KEY
 		table.string('comment_username');
 		table.integer('comment_post_id');
-		table.specificType('comment_body', 'text[]');
+		table.specificType('comment_body', 'jsonb[]');
 	});
 
 

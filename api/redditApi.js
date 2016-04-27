@@ -103,8 +103,8 @@ apiRouter.post('/login', function(req, res) {
 //get Posts from DB
 apiRouter.get('/posts', function(req, res, next) {
 
-	knex('posts')
-	.join('users', 'posts.user_id', '=', 'users.id')
+	knex('users')
+	.join('posts', 'users.id', '=', 'posts.user_id')
 	.then(function(data){
 	    	res.json({data});
 	});
@@ -123,11 +123,11 @@ apiRouter.get('/posts', function(req, res, next) {
 apiRouter.post('/posts', function(req, res, next) {
 	knex('posts')
 	.where({id: req.body.id}).first().then(function(post){
-		if(post){
+		if(post !== undefined){
 			knex('posts')
 			.where({id: post.id})
 			.first()
-			.update({comment_body: req.body.comments})
+			.update({comment_body: req.body.comment_body})
 			.then(function(done){
 						return done;
 					        })
@@ -140,8 +140,7 @@ apiRouter.post('/posts', function(req, res, next) {
 			    	 post_time: new Date(),
 			    	 post_body:req.body.post_body,
 			    	 post_score: 0,
-			    	 comment_body: [],
-			    	 commentOn: false
+			    	 comment_body: []
 			}).then(function(done){
 				
 				return done;
@@ -170,13 +169,13 @@ apiRouter.post('/comments', function(req, res, next) {
 			.first()
 			.update({comment_body: req.body.comments})
 			.returning('id')
-			.then(function(id){
-			    knex('post_comments')
-			    .insert({post_id: req.body.postId, comment_id: id[0]})
-			    .then(function(done){
+			.then(function(done){
+			    //knex('post_comments')
+			    //.insert({post_id: req.body.postId, comment_id: id[0]})
+			    //.then(function(done){
 		
 				return done;
-			     })
+			    // })
 			});
 		}else{
 			knex('comments')

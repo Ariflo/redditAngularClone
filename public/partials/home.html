@@ -97,7 +97,7 @@
 		
 		<div class="col-xs-10">
 			 <div class="titleThumb noselect">
-    				<strong>{{post.title}}  |  </strong>
+    				<strong> {{post.title}}  |  </strong>
 
                             <span ng-style="{'color':'green'}" ng-click="ratingUp(post)" id="thumbs-up" id="thumbs-up" class="glyphicon glyphicon-thumbs-up pointer"></span>
 
@@ -132,7 +132,9 @@
               </form>
           </div>
 
-	<div ng-repeat="comment in comments">
-		<div ng-show="post.commentOn" class="comment"><b>{{comment_username}}:</b> {{comment}}</div>
+	<div class="col-xs-4" ng-repeat="comment in post.comment_body track by $index" >
+		<div ng-show="!post.commentOn" class="comment"><b>{{comment.user}}:</b>
+                  <span ng-repeat="comment in comment.comments track by $index"> {{comment}}</span>
+            </div>
 	</div>
 </div>
