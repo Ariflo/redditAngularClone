@@ -24,7 +24,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 
 		         			var _getPosts = function(posts){
 
-		         					//var postArray =[];
+		         					var postArray =[];
 
 	         						if(posts.data === undefined){
 	         							return null;
@@ -37,10 +37,9 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse', '$location'
 	         									$scope.comment_username = comments.user;
 	         									$scope.comments = comments.comments;
 	         									post.commentOn = true;
-	         									console.log(post);
 	         								}
 	         							});
-	         							$scope.posts = posts.data;
+	         							$scope.posts = postArray;
 	         						}
 
 		         			}	
