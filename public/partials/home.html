@@ -132,10 +132,12 @@
               </form>
           </div>
 
-          <div class="col-xs-4" ng-repeat="comment in post.comment_body track by $index" >
-              <div ng-show="!post.commentOn" class="comment" ng-repeat="comment in comment.comments track by $index">
-                            <b>{{post.comment_user}}:</b>
-                            <span > {{comment}}</span>
-                      </div>
+          <div class="col-xs-4" ng-repeat="commentObjs in post.comment_body  track by $index" >
+                        <div ng-show="!post.commentOn" class="comment" ng-repeat="commenter in commentObjs.comment_body track by $index" >
+                              <span ng-repeat="comments in commenter.comments track by $index">
+                                     <b>{{commenter.user}}:</b>
+                                     <span > {{comments}}</span>
+                              </span>
+                        </div>
             </div>
 </div>

@@ -162,22 +162,15 @@ apiRouter.get('/comments', function(req, res, next) {
 //post Comments to DB
 apiRouter.post('/comments', function(req, res, next) {
 	knex('comments')
-	.where({comment_post_id: req.body.postId}).first().then(function(comments){
-		if(comments && comments.comment_username === req.body.username){
-			knex('comments')
-			.where({comment_post_id: comments.comment_post_id, comment_username: comments.comment_username})
-			.first()
-			.update({comment_body: req.body.comments})
-			.returning('id')
-			.then(function(done){
-			    //knex('post_comments')
-			    //.insert({post_id: req.body.postId, comment_id: id[0]})
-			    //.then(function(done){
-		
-				return done;
-			    // })
-			});
-		}else{
+	.where({comment_post_id: req.body.postId}).then(function(comments){
+
+		var usernames = [];
+
+		for(var i = 0; i < comments.length; i++){
+			usernames.push(comments[i].comment_username);
+		}
+
+		if(comments.length <= 0 || usernames.indexOf(req.body.username) === -1){
 			knex('comments')
 			.insert({comment_username: req.body.username,
 				comment_post_id: req.body.postId,
@@ -187,12 +180,29 @@ apiRouter.post('/comments', function(req, res, next) {
 			    knex('post_comments')
 			    .insert({post_id: req.body.postId, comment_id: id[0]})
 			    .then(function(done){
-		
 				return done;
 			     })
 			});
+		}else{
+			for(var i=0; i<comments.length; i++){
+
+				if(comments[i].comment_username === req.body.username){
+					knex('comments')
+					.where({comment_post_id: comments[i].comment_post_id, comment_username: req.body.username})
+					.first()
+					.update({comment_body: req.body.comments})
+					.returning('id')
+					.then(function(done){
+					    //knex('post_comments')
+					    //.insert({post_id: req.body.postId, comment_id: id[0]})
+					    //.then(function(done){
+						return done;
+					    // })
+					});
+				}
+			}
 		}
-	})
+	});
 });
 
 
