@@ -39,29 +39,3 @@ redditApp.directive('modal', function () {
       }
     };
   });
-
-// redditApp.directive('comments', function () {
-//   return{
-//       template: '<div class="col-xs-4" ng-repeat="comment in comments track by $index" >' +
-//               '<div ng-show="!post.commentOn" class="comment" ng-repeat="commenter in comment.comment_body track by $index" >' +
-//                         +'<div ng-repeat="commenters in commenter.comments track by $index">'+
-//                            '<b>{{commenter.user}}:</b>' +
-//                             '<span > {{commenters}}</span>' +
-//                         '</div>'+
-//                       '</div>' +
-//             '</div>',
-//             restrict: 'E',
-//             scope: { commentData: '=commentData' },
-//             link: function(scope, element, attrs) {
-//                 var resources = scope.commentData;
-//                 console.log(resources.length);
-//                 if(resources.length > 1){
-//                   scope.comments = resources;
-//                 }else{
-//                   scope.comments = resources.comment_body;
-//                 }
-//             }
-//   };
-
-
-// });

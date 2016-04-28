@@ -76,13 +76,13 @@
       <div class="form-group">
 
             <label>Title</label>
-            <input type="text" ng-model="newPostData.title" name="title" class="form-control" id="name" placeholder="Name" required>       
+            <input type="text" ng-model="newPostData.title" name="title" class="form-control" id="name" placeholder="Name" autocomplete="off" required>       
 
             <label>Image</label>
-            <input type="url" ng-model="newPostData.image" name="image" class="form-control" id="image" placeholder="http://jpg.com.jpg"required> 
+            <input type="url" ng-model="newPostData.image" name="image" class="form-control" id="image" placeholder="http://jpg.com.jpg" autocomplete="off" required> 
 
             <label>Post Text</label>
-            <input type="text" ng-model="newPostData.post_body" name="post"  class="form-control" id="comment" placeholder="Place text here..." required><br>
+            <input type="text" ng-model="newPostData.post_body" name="post"  class="form-control" id="comment" placeholder="Place text here..." autocomplete="off" required><br>
 
             <input type="submit" class="btn btn-success"  value="POST">
 
