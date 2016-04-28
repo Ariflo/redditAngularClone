@@ -13,6 +13,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', 
 		         					method: "GET",
 		         					url: "/user/" + token
 		         				}).then(function(data) {
+		         					console.log(data);
 		         					$scope.user.id = data.data.id[0];
 		         					$scope.user.username = data.data.username;
 		         					$scope.isAuthenticated = true;
