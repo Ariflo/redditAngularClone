@@ -2,7 +2,7 @@
   <div class="container-fluid">
     
     <div class="navbar-header">
-      <a class="navbar-brand" href="https://redditangle.herokuapp.com/#/">Redditer</a>
+      <a class="navbar-brand" href="https://redditangle.herokuapp.com/#/">RedditAngle</a>
     </div>
 
     <div class="collapse navbar-collapse">
@@ -68,7 +68,7 @@
           </form>
 </modal>
 
-<h1 class="text-center" ng-if="!isAuthenticated">Welcome to Reddit with Angular</h1>
+<h1 class="text-center" ng-if="!isAuthenticated">Welcome to RedditAngle</h1>
 <h1 class="text-center" ng-if="isAuthenticated">Welcome</h1>
 <h1 class="text-center" ng-if="isAuthenticated">{{user.username}}</h1>
 
@@ -133,10 +133,12 @@
           </div>
 
           <div class="col-xs-4" ng-repeat="commentObjs in post.comment_body  track by $index" >
-                        <div ng-show="!post.commentOn" class="comment" ng-repeat="commenter in commentObjs.comment_body track by $index" >
+                        <div ng-show="!post.commentOn" ng-repeat="commenter in commentObjs.comment_body track by $index" >
                               <span ng-repeat="comments in commenter.comments track by $index">
-                                     <b>{{commenter.user}}:</b>
-                                     <span > {{comments}}</span>
+                                    <div class="comment">
+                                      <b>{{commenter.user}}:</b>
+                                      <span > {{comments}}</span>
+                                    </div>
                               </span>
                         </div>
             </div>
