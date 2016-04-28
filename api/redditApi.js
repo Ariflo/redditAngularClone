@@ -18,7 +18,7 @@ apiRouter.get('/user/:id', function(req, res, next) {
 			var token = req.headers.authorization.split(' ')[1];
 			var decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-			res.send(decoded);
+			res.json({decoded});
 		}
 });
 
@@ -27,7 +27,7 @@ apiRouter.post('/users', function(req, res) {
 	knex('users').where({username: req.body.username}).first().then(function(user){
 	  if(user || req.body.password !== req.body.passwordconfirm){
 
-		    res.send({
+		    res.json({
 		        error: JSON.stringify(err),
 		        message: "email already in use/passwords do not match"
 		    });
@@ -45,14 +45,14 @@ apiRouter.post('/users', function(req, res) {
 
 	        	// On success, we send the token back
 	        	// to the browser.
-	        	res.send({jwt:token, username:req.body.username, id: id});
+	        	res.json({jwt:token, username:req.body.username, id: id});
 	        });
 	      });
 	    });
 	  }
 	}).catch(function(err){
 	        console.log(err);
-	        res.send({
+	        res.json({
 	            error: JSON.stringify(err),
 	            message: "Error connecting to Database"
 	        })
@@ -76,16 +76,16 @@ apiRouter.post('/login', function(req, res) {
 
 	    				// On success, we send the token back
 	    				// to the browser.
-	    				res.send({jwt:token, username:user.username, id: user.id});
+	    				res.json({jwt:token, username:user.username, id: user.id});
 	    			}else{
-					res.send({
+					res.json({
 			            		error: JSON.stringify(err),
 			            		message: "no matching user/password combo"
 				        	});
 	    			}
 	    		});
 	    	}else{
-	    		res.send({
+	    		res.json({
 	                		error: JSON.stringify(err),
 	                		message: "no matching user/password combo"
 	            	});
@@ -93,7 +93,7 @@ apiRouter.post('/login', function(req, res) {
 
 	    }).catch(function(err){
 	        console.log(err);
-	        res.send({
+	        res.json({
 	            error: JSON.stringify(err),
 	            message: "Error connecting to Database"
 	        })
@@ -102,21 +102,11 @@ apiRouter.post('/login', function(req, res) {
 
 //get Posts from DB
 apiRouter.get('/posts', function(req, res, next) {
-
 	knex('users')
 	.join('posts', 'users.id', '=', 'posts.user_id')
 	.then(function(data){
 	    	res.json({data});
 	});
-
-
-	// knex('users')
-	
-	// .join('post_comments', 'posts.id', '=', 'post_comments.post_id')
-	// .join('comments', 'post_comments.post_id', '=', 'comments.comment_post_id ')
-	// .then(function(data){
-	//     	res.json({data});
-	// });
 });
 
 //Posts Posts into DB
@@ -193,11 +183,7 @@ apiRouter.post('/comments', function(req, res, next) {
 					.update({comment_body: req.body.comments})
 					.returning('id')
 					.then(function(done){
-					    //knex('post_comments')
-					    //.insert({post_id: req.body.postId, comment_id: id[0]})
-					    //.then(function(done){
 						return done;
-					    // })
 					});
 				}
 			}
