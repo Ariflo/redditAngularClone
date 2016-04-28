@@ -67,6 +67,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', 
 		         						data: $scope.user
 		         					}).then(function(data) {
 		         						// Save the JWT to localStorage so we can use it later
+		         						console.log(data);
 		         						localStorage.setItem('jwt', data.data.jwt);
 		         						$scope.user.id = data.data.id[0];
 		         						$scope.user.username = data.data.username;
