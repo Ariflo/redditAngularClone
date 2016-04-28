@@ -89,7 +89,7 @@
       </div>
 </form>
 	
-<div class="container" ng-repeat = "post in posts | filter:searchText | orderBy: currentOrderBy">
+<div class="container" ng-repeat = "post in posts  | filter:searchText | orderBy: currentOrderBy">
 	<div class="row">
 		<div class = "col-xs-2" >
 			<img class="ico" ng-src="{{post.img_url}}">
@@ -132,10 +132,10 @@
               </form>
           </div>
 
-	<div class="col-xs-4" ng-repeat="comment in post.comment_body track by $index" >
-		<div ng-show="!post.commentOn" class="comment" ng-repeat="comment in comment.comments track by $index">
-                  <b>{{post.comment_user}}:</b>
-                  <span > {{comment}}</span>
+          <div class="col-xs-4" ng-repeat="comment in post.comment_body track by $index" >
+              <div ng-show="!post.commentOn" class="comment" ng-repeat="comment in comment.comments track by $index">
+                            <b>{{post.comment_user}}:</b>
+                            <span > {{comment}}</span>
+                      </div>
             </div>
-	</div>
 </div>

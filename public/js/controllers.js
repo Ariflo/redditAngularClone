@@ -32,17 +32,21 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', 
          							posts.data.forEach(function(post){
 
          								Comment.query(post, function(comments){
-
-         									var commentData = comments[0];
-         									if(commentData !== undefined){
-         										//assign this posts comments 
-         										post.comment_user = commentData.comment_body[0].user;
-         										post.comment_body = commentData.comment_body
-         										postArray.push(post);
-
-         									}else{
+         									//console.log(comments)
+         									if(comments[0] === undefined){
          										//assign this post with no comments 
          										post.comment_body = [];
+         										postArray.push(post);
+         									}else{
+
+         										for(var i = 0; i < comments.length; i++){
+         											//console.log(comments)
+         											var commentData = comments[i];
+         				
+											//assign this posts comments 
+											post.comment_user = commentData.comment_body[0].user;
+											post.comment_body = commentData.comment_body;
+         										}
          										postArray.push(post);
          									}
          								});
@@ -118,9 +122,9 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', 
 
 	         							Post.save($scope.newPostData);
 
-	         							$timeout(function(){
-	         								Post.get(_getPosts);
-	         							}, 500);
+	         							// $timeout(function(){
+	         							// 	Post.get(_getPosts);
+	         							// }, 500);
 	         							
 		         					}
 	         					            $scope.newPostData = {};
@@ -134,8 +138,7 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', 
 		         					Comment.query(post, function(comments){
 
 		         						var commentData = comments[0];
-		         						
-		         						if(commentData !== undefined){
+		         						if(commentData !== undefined && commentData.comment_body[0].user === $scope.user.username){
 		         							post.comment_body[0].comments.push(post.comment);
 
 		         							post.commentPost.username = $scope.user.username;
@@ -143,9 +146,9 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', 
 		         							post.commentPost.comments =post.comment_body;
 
 		         							Comment.save(post.commentPost);
-		         							$timeout(function(){
-		         								Post.get(_getPosts);
-		         							}, 500);
+		         							// $timeout(function(){
+		         							// 	Post.get(_getPosts);
+		         							// }, 500);
 		         						}else{
 		         					                        post.comment_body = [{user: $scope.user.username, 
 		         					                        				        comments: [post.comment]}];
@@ -153,11 +156,12 @@ redditApp.controller('homeController', ['$scope', '$http', '$parse','$timeout', 
 		         					                      	post.commentPost.username = $scope.user.username;
 		         					                      	post.commentPost.postId = post.id;
 		         					                      	post.commentPost.comments = post.comment_body;
+		         						
 
 		         					                      	Comment.save(post.commentPost);
-			         						$timeout(function(){
-			         							Post.get(_getPosts);
-			         						}, 500);
+			         						// $timeout(function(){
+			         						// 	Post.get(_getPosts);
+			         						// }, 500);
 		         						}
 		         					});	
 		         				};		
