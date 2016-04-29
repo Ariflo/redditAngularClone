@@ -24,6 +24,7 @@ apiRouter.get('/user/:id', function(req, res, next) {
 
 //SIGNUP
 apiRouter.post('/users', function(req, res) {
+	console.log("made it!");
 	knex('users').where({username: req.body.username}).first().then(function(user){
 	  if(user || req.body.password !== req.body.passwordconfirm){
 		    res.json({
@@ -35,7 +36,7 @@ apiRouter.post('/users', function(req, res) {
 
 	        bcrypt.hash(req.body.password, salt, function(err, hash){
 	        knex('users').insert({username: req.body.username, password: hash}).returning('id').then(function(id){
-	  	console.log("made it!")
+	  	
 	  	console.log(id);
 	        	// We sign enough information to determine if 
 	            // the user is valid in the future. 
