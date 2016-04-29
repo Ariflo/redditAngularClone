@@ -26,7 +26,6 @@ apiRouter.get('/user/:id', function(req, res, next) {
 apiRouter.post('/users', function(req, res) {
 	knex('users').where({username: req.body.username}).first().then(function(user){
 	  if(user || req.body.password !== req.body.passwordconfirm){
-
 		    res.json({
 		        error: JSON.stringify(err),
 		        message: "email already in use/passwords do not match"
@@ -36,6 +35,8 @@ apiRouter.post('/users', function(req, res) {
 
 	        bcrypt.hash(req.body.password, salt, function(err, hash){
 	        knex('users').insert({username: req.body.username, password: hash}).returning('id').then(function(id){
+	  	console.log("made it!")
+	  	console.log(id);
 	        	// We sign enough information to determine if 
 	            // the user is valid in the future. 
 	            // In our case, username and password are required
