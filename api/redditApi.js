@@ -24,11 +24,11 @@ apiRouter.get('/user/:id', function(req, res, next) {
 
 //SIGNUP
 apiRouter.post('/users', function(req, res) {
-	console.log("made it!");
 	knex('users').where({username: req.body.username}).first().then(function(user){
+		console.log("made it!:" user);
+		console.log("made it!:" req.body);
 	  if(user || req.body.password !== req.body.passwordconfirm){
 		    res.json({
-		        error: JSON.stringify(err),
 		        message: "email already in use/passwords do not match"
 		    });
 	  }else{
