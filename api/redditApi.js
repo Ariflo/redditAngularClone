@@ -16,7 +16,7 @@ apiRouter.get('/user/:id', function(req, res, next) {
 		if (req.headers.authorization) {
 
 			var token = req.headers.authorization.split(' ')[1];
-			var decoded = jwt.verify(token, process.env.JWT_SECRET);
+			var decoded = jwt.verify(token, "BOOTSCATS");
 
 			res.json({decoded});
 		}
@@ -34,15 +34,12 @@ apiRouter.post('/users', function(req, res) {
 
 	        bcrypt.hash(req.body.password, salt, function(err, hash){
 	        knex('users').insert({username: req.body.username, password: hash}).returning('id').then(function(id){
-	  	
-	  	console.log(id);
-	  	console.log(process.env.JWT_SECRET);
 	        	// We sign enough information to determine if 
 	            // the user is valid in the future. 
 	            // In our case, username and password are required
 	        	var token = jwt.sign({id: id,
 	        			         username: req.body.username
-		        	                 }, process.env.JWT_SECRET);
+		        	                 }, "BOOTSCATS");
 
 	        	// On success, we send the token back
 	        	// to the browser.
@@ -73,7 +70,7 @@ apiRouter.post('/login', function(req, res) {
 	    				// In our case, username and password are required
 	    				var token = jwt.sign({ id: user.id,
 	    					username: req.body.username
-	    				                 }, process.env.JWT_SECRET);
+	    				                 }, "BOOTSCATS");
 
 	    				// On success, we send the token back
 	    				// to the browser.
